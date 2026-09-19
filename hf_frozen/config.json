@@ -1,14 +1,30 @@
 {
   "activation": "gelu",
-  "architectures": ["DistilBertForSequenceClassification"],
+  "architectures": [
+    "DistilBertForSequenceClassification"
+  ],
   "attention_dropout": 0.1,
   "dim": 768,
   "dropout": 0.1,
   "dtype": "float32",
   "hidden_dim": 3072,
-  "id2label": {"0":"sadness","1":"joy","2":"love","3":"anger","4":"fear","5":"surprise"},
+  "id2label": {
+    "0": "sadness",
+    "1": "joy",
+    "2": "love",
+    "3": "anger",
+    "4": "fear",
+    "5": "surprise"
+  },
   "initializer_range": 0.02,
-  "label2id": {"anger":3,"fear":4,"joy":1,"love":2,"sadness":0,"surprise":5},
+  "label2id": {
+    "anger": 3,
+    "fear": 4,
+    "joy": 1,
+    "love": 2,
+    "sadness": 0,
+    "surprise": 5
+  },
   "max_position_embeddings": 512,
   "model_type": "distilbert",
   "n_heads": 12,
