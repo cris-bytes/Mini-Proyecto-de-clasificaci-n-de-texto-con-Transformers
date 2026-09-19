@@ -1,183 +1,170 @@
-# Clasificación de emociones con Transformers
+<div align="center">
 
-Proyecto de Procesamiento de Lenguaje Natural — **Grupo X-Ray**.
+# Emotion Classification with Transformers
 
-Este repositorio compara distintos enfoques de clasificación de texto sobre el dataset **dair-ai/emotion**, desde modelos base hasta Transformers preentrenados y ajustados.
+### NLP · Grupo X-Ray
 
-## Objetivo
+**Comparación experimental entre MLP, Transformers desde cero y DistilBERT para clasificación multiclase de emociones.**
 
-Clasificar textos cortos en inglés en seis emociones:
+`PyTorch` · `Transformers` · `Hugging Face` · `Scikit-learn` · `Python 3.11`
 
-- sadness
-- joy
-- love
-- anger
-- fear
-- surprise
+</div>
 
-## Modelos evaluados
+---
 
-El proyecto incluye:
+## Descripción
 
-1. **MLP baseline**
-2. **Transformer desde cero con posiciones aprendibles**
-3. **Transformer desde cero con codificación posicional sinusoidal**
-4. **DistilBERT frozen**
-5. **DistilBERT fine-tuned**
+El proyecto estudia la clasificación automática de textos cortos en inglés usando el corpus **dair-ai/emotion**. Cada observación pertenece a una de seis categorías:
 
-## Resultados principales
+| ID | Emoción |
+|---:|---|
+| 0 | sadness |
+| 1 | joy |
+| 2 | love |
+| 3 | anger |
+| 4 | fear |
+| 5 | surprise |
 
-| Modelo | Accuracy | Macro F1 |
-|---|---:|---:|
-| MLP | 80.11% | 72.88% |
-| Transformer sinusoidal | 86.00% | 82.36% |
-| DistilBERT frozen | 59.12%* | 40.75%* |
-| DistilBERT fine-tuned | 93.57%* | 90.96%* |
+El objetivo no es únicamente obtener una métrica final: el notebook desarrolla un recorrido experimental desde un baseline neuronal hasta transferencia de aprendizaje con DistilBERT, incluyendo reproducibilidad, análisis de errores y comparación de arquitecturas.
 
-\* Métricas de validación registradas por Hugging Face Trainer. Los resultados finales de prueba y el análisis completo se encuentran en el notebook.
+## Experimentos
 
-El modelo fine-tuned muestra la mejora más clara frente a mantener congelado el encoder preentrenado.
+### 1. MLP baseline
+Modelo neuronal de referencia utilizado para establecer una línea base antes de introducir mecanismos de atención.
 
-## Estructura del repositorio
+### 2. Transformer desde cero
+Se entrenan Transformers pequeños y se compara el tratamiento de posición mediante:
+
+- positional encoding sinusoidal;
+- positional embeddings aprendibles.
+
+Los modelos pequeños se ejecutan con varias semillas para observar estabilidad entre entrenamientos.
+
+### 3. DistilBERT frozen
+Se utiliza DistilBERT preentrenado manteniendo congelado el encoder y entrenando el clasificador.
+
+### 4. DistilBERT fine-tuned
+Se ajusta el modelo preentrenado sobre el corpus de emociones, permitiendo adaptar sus representaciones al problema específico.
+
+## Resultados
+
+| Modelo | Accuracy | Macro F1 | Evaluación |
+|---|---:|---:|---|
+| MLP | 80.11% | 72.88% | Test |
+| Transformer sinusoidal | 86.00% | 82.36% | Test |
+| DistilBERT frozen | 59.12% | 40.75% | Validación |
+| DistilBERT fine-tuned | **93.57%** | **90.96%** | Validación |
+
+> Las métricas de DistilBERT de esta tabla corresponden al estado de validación registrado por Hugging Face Trainer. El notebook contiene el flujo completo de evaluación y el análisis experimental.
+
+La comparación muestra que congelar el encoder limita considerablemente el desempeño en esta tarea, mientras que el fine-tuning permite adaptar DistilBERT a las seis clases del corpus.
+
+## Flujo experimental
+
+```text
+dair-ai/emotion
+       │
+       ▼
+Revisión y preparación de datos
+       │
+       ├──────────────► MLP baseline
+       │
+       ├──────────────► Transformer + posición aprendible
+       │
+       ├──────────────► Transformer + posición sinusoidal
+       │
+       └──────────────► DistilBERT
+                          ├── Frozen
+                          └── Fine-tuned
+                               │
+                               ▼
+                 Accuracy · Macro F1 · errores
+```
+
+## Contenido del notebook
+
+El notebook principal cubre de extremo a extremo:
+
+- definición del problema y alcance;
+- semillas y reproducibilidad;
+- revisión de calidad del dataset;
+- distribución de clases;
+- tokenización y longitud de secuencia;
+- construcción de MLP y Transformer;
+- entrenamiento con varias semillas;
+- comparación de codificación posicional;
+- DistilBERT frozen y fine-tuned;
+- matrices de confusión y métricas por clase;
+- análisis cualitativo de errores;
+- exploración de atención;
+- prueba de negación;
+- clasificador de demostración;
+- conclusiones y limitaciones.
+
+## Estructura
 
 ```text
 .
-├── 2-transformers-text-classification-xray.ipynb
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
 ├── emotion_tokenizer/
-│   ├── tokenizer.json
-│   ├── tokenizer_config.json
-│   └── special_tokens_map.json
+│   ├── special_tokens_map.json
+│   └── tokenizer_config.json
 ├── hf_finetuned/
 │   ├── config.json
-│   ├── model.safetensors
-│   ├── special_tokens_map.json
-│   ├── tokenizer_config.json
-│   ├── tokenizer.json
-│   ├── trainer_state.json
-│   ├── training_args.bin
-│   └── vocab.txt
+│   └── trainer_state.json
 ├── hf_frozen/
 │   ├── config.json
-│   ├── model.safetensors
-│   ├── special_tokens_map.json
-│   ├── tokenizer_config.json
-│   ├── tokenizer.json
-│   ├── trainer_state.json
-│   ├── training_args.bin
-│   └── vocab.txt
+│   └── trainer_state.json
 ├── checkpoints/
-│   ├── MLP_42.pt
-│   ├── MLP_43.pt
-│   ├── MLP_44.pt
-│   ├── Transformer posiciones aprendibles_42.pt
-│   ├── Transformer posiciones aprendibles_43.pt
-│   ├── Transformer posiciones aprendibles_44.pt
-│   ├── Transformer sinusoidal_42.pt
-│   ├── Transformer sinusoidal_43.pt
-│   └── Transformer sinusoidal_44.pt
+│   └── README.md
 └── results/
-    ├── comparacion_final.csv
-    ├── entorno.json
-    ├── experimentos_validacion.csv
-    ├── predicciones_prueba.csv
-    └── revision_datos.csv
+    └── README.md
 ```
 
-## Dataset
-
-Se utiliza **dair-ai/emotion**, un corpus de textos en inglés etiquetados en seis emociones.
-
-Este proyecto clasifica etiquetas presentes en el corpus y **no debe interpretarse como una herramienta de diagnóstico psicológico**.
-
-## Metodología
-
-El notebook documenta:
-
-1. definición del problema;
-2. preparación del entorno y reproducibilidad;
-3. revisión de calidad de datos;
-4. análisis de distribución de clases;
-5. tokenización;
-6. entrenamiento de modelos base;
-7. comparación entre codificaciones posicionales;
-8. transferencia de aprendizaje con DistilBERT;
-9. evaluación cuantitativa;
-10. matrices de confusión y métricas por clase;
-11. análisis cualitativo de errores;
-12. exploración de atención;
-13. prueba de negación;
-14. demo de clasificación;
-15. conclusiones y limitaciones.
-
-## Reproducibilidad
-
-Los modelos pequeños se evaluaron con varias semillas para reducir dependencia de una única inicialización. DistilBERT fue entrenado con una configuración más limitada por costo computacional.
-
-Los artefactos generados se incluyen para conservar:
-
-- tokenizer entrenado;
-- configuración de los modelos;
-- pesos de DistilBERT;
-- estado del Trainer;
-- checkpoints de modelos construidos desde cero;
-- predicciones y métricas de evaluación;
-- información del entorno de ejecución.
-
-## Entorno
-
-- Python 3.11
-- PyTorch 2.8.0
-- Transformers 4.57.6
-- Datasets 4.4.1
-- Tokenizers 0.22.2
-- Accelerate 1.12.0
-- NumPy 2.2.6
-- Pandas 2.3.3
-- Scikit-learn 1.7.2
-
-Las versiones completas están definidas en `requirements.txt`.
+Esta sección refleja **únicamente los archivos que ya están versionados en GitHub**. Los artefactos binarios y el notebook se incorporan de forma separada para evitar documentar archivos inexistentes.
 
 ## Instalación
 
 ```bash
+git clone https://github.com/cris-bytes/Mini-Proyecto-de-clasificaci-n-de-texto-con-Transformers.git
+cd Mini-Proyecto-de-clasificaci-n-de-texto-con-Transformers
+
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Después, abrir:
+## Stack
 
-```text
-2-transformers-text-classification-xray.ipynb
-```
+| Componente | Tecnología |
+|---|---|
+| Deep Learning | PyTorch 2.8 |
+| Transformers | Hugging Face Transformers 4.57.6 |
+| Dataset | Hugging Face Datasets |
+| ML / métricas | Scikit-learn |
+| Manipulación | Pandas · NumPy |
+| Visualización | Matplotlib |
+| Modelo preentrenado | DistilBERT |
 
-en JupyterLab, Jupyter Notebook o Google Colab.
+## Reproducibilidad
 
-## Métrica principal
+El experimento conserva configuración, estados de entrenamiento y artefactos para poder reconstruir las ejecuciones. Los modelos pequeños fueron comparados usando múltiples semillas; DistilBERT se ejecutó con un presupuesto computacional más restringido.
 
-La métrica principal es **Macro F1**, acompañada de:
+## Uso responsable
 
-- Accuracy
-- F1 ponderado
-- métricas por clase
-- matrices de confusión
-- análisis cualitativo de errores
+Las etiquetas representan las categorías del corpus. La salida de estos modelos **no constituye una evaluación clínica ni permite inferir de forma fiable el estado psicológico de una persona**.
 
-## Tecnologías
+## Autoría
 
-Python · PyTorch · Hugging Face Transformers · Hugging Face Datasets · Scikit-learn · Pandas · NumPy · Matplotlib
+**Grupo X-Ray**  
+Proyecto académico de Procesamiento de Lenguaje Natural.
 
-## Referencias
+---
 
-- Hugging Face — dair-ai/emotion
-- Vaswani et al. — Attention Is All You Need
-- DistilBERT — distilbert-base-uncased
-- Hugging Face Transformers Trainer
-- Demszky et al. — GoEmotions
+<div align="center">
 
-## Nota
+**NLP · Transformers · Transfer Learning · Emotion Classification**
 
-Los resultados están acotados al dataset, configuración experimental y presupuesto computacional utilizados. El repositorio tiene fines académicos y de experimentación en NLP.
+</div>
