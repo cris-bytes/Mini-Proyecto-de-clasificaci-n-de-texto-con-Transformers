@@ -1,0 +1,4 @@
+División,Original,Faltantes,Vacíos,Filas contradictorias,Copias repetidas,Coinciden con división anterior,Final
+train,16000,0,0,60,1,0,15939
+validation,2000,0,0,4,0,5,1991
+test,2000,0,0,0,0,14,1986
