@@ -8,6 +8,5 @@ env/
 .vscode/
 .idea/
 *.h5
-*.pt
 *.pth
 *.ckpt
